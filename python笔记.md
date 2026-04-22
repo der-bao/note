@@ -273,6 +273,42 @@ print(next(gen_expr))  # 输出: 1
 total = sum(i**2 for i in range(10)) 
 ```
 
+## async & await (异步编程)
+
+1. **核心概念**：`async` 和 `await` 是 Python 中用于处理并发（异步 I/O）的关键字，主要用于网络请求、文件读写、数据库查询等耗时等待操作，避免阻塞主线程。
+2. **定义和执行**：使用 `async def` 定义的函数称为“协程（Coroutine）”。直接调用协程函数只会返回一个协程对象，并不会运行。必须通过事件循环（如 `asyncio.run()`）或在其他协程中被 `await` 调用才会执行。
+3. **交出控制权 (await)**：`await` 操作符用于挂起当前协程，将控制权交还给事件循环，去执行其他任务。它后面跟的必须是一个**可等待对象**（Awaitable），比如另一个协程对象或 `Task`。
+4. **极大地提升效率**：在 I/O 密集型任务中，通过 `asyncio.gather()` 等方法并发执行多个协程，可以大幅缩短总的等待时间。
+
+```python
+import asyncio
+import time
+
+async def fetch_data(task_id: int):
+    print(f"任务 {task_id}: 开始执行...")
+    # 模拟网络请求等耗时 I/O 操作 (非阻塞等待)
+    await asyncio.sleep(2)  
+    print(f"任务 {task_id}: 执行完成！")
+    return f"Result_{task_id}"
+
+async def main():
+    start_time = time.time()
+    
+    # 并发执行 3 个异步任务
+    # fetch_data() 返回的是协程对象，gather 会将它们打包并发调度
+    results = await asyncio.gather(
+        fetch_data(1),
+        fetch_data(2),
+        fetch_data(3)
+    )
+    
+    print(f"所有结果: {results}")
+    print(f"总耗时: {time.time() - start_time:.2f} 秒")  # 大约 2 秒，而不是 6 秒
+
+# 启动事件循环作为程序的入口点
+# asyncio.run(main()) 
+```
+
 # Temp、杂七杂八
 
 ## python导包
