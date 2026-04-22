@@ -245,7 +245,60 @@ if not hasattr(config, "url"):
     print("URL is not configured.")       # 输出: URL is not configured.
 ```
 
-# 五、高级语法特性
+# 五、迭代器与生成器
+
+## 1. 可迭代对象 (Iterable)
+
+1. **核心定义**：实现了 `__iter__()` 方法或 `__getitem__()` 方法的对象。
+2. **通俗理解**：可以被 `for` 循环遍历的对象。例如：`list`, `tuple`, `dict`, `set`, `str`。
+3. **判断方法**：使用 `isinstance(obj, Iterable)` (需从 `collections.abc` 导入)。
+4. 每次迭代可迭代对象时，都是返回一个迭代器。
+
+## 2. 迭代器 (Iterator)
+
+1. **核心定义**：实现了 `__iter__()` 和 `__next__()` 方法（即迭代器协议）的对象。
+2. **特点**：
+   - 只能向前不能向后。
+   - **惰性求值**：只有在调用 `next()` 时才会计算并返回下一个值。
+   - 记录当前的迭代位置，一旦耗尽，再次调用 `next()` 会抛出 `StopIteration` 异常。
+3. **关系**：迭代器一定是可迭代对象，但可迭代对象不一定是迭代器（可以通过 `iter(iterable)` 将其转换为迭代器）。
+
+```python
+it = iter([1, 2])
+print(next(it))  # 1
+print(next(it))  # 2
+# print(next(it))  # 抛出 StopIteration
+```
+
+## 3. 生成器 (Generator)
+
+1. **核心定义**：一种特殊的迭代器，通过函数或表达式创建，不需要手动实现 `__iter__` 和 `__next__`。
+2. **创建方式**：
+   - **生成器表达式**：`(x for x in range(10))`。
+   - **生成器函数**：包含 `yield` 关键字的函数。
+3. **优势**：写起来更简洁，且同样具备惰性求值、节省内存的特性。
+
+## 4. yield 关键字
+
+1. **作用**：在函数中返回值并**暂停**执行。
+2. **运行机制**：
+   - 当调用生成器函数时，它不会立即执行函数体，而是返回一个生成器对象。
+   - 每次调用 `next()`，函数执行到 `yield` 处，返回其后的值并“冻结”当前状态。
+   - 下次调用 `next()`，从暂停处继续执行。
+
+```python
+def count_up_to(n):
+    count = 1
+    while count <= n:
+        yield count  # 暂停并返回值
+        count += 1
+
+gen = count_up_to(3)
+for num in gen:
+    print(num)
+```
+
+# 六、高级语法特性
 
 ## 生成器表达式 (Generator Expression)
 
